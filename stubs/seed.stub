@@ -1,0 +1,23 @@
+import Knex from 'knex';
+
+const TABLE_NAME = 'table_name';
+
+/**
+ * Load initial seed data for <table_name>.
+ *
+ * @param  {object} knex
+ * @param  {object} Promise
+ * @return {Promise}
+ */
+export function seed(knex: Knex, Promise) {
+  return knex(TABLE_NAME).insert([
+    {
+      colName: 'rowValue',
+      colName2: 'rowValue'
+    },
+    {
+      colName: 'rowValue',
+      colName2: 'rowValue'
+    }
+  ]);
+}
