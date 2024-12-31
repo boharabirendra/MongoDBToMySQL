@@ -25,6 +25,14 @@ System should have installed following
 
 - Create .env file same as .env.example
 - Add MySQL & MongoDB credentials to .env file
+- Run migration for creating table in production database using below command
+
+```sh
+   (Make sure you are in MONGODBTOMYSQL directory/folder)
+
+   npx knex migrate:latest
+```
+
 - Run the script using below command
 
 ```sh
