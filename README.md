@@ -28,7 +28,7 @@ System should have installed following
 - Run migration for creating table in production database using below command
 
 ```sh
-   (Make sure you are in MONGODBTOMYSQL directory/folder)
+   (Make sure you are in MongoDBToMySQL directory/folder)
 
    npx knex migrate:latest
 ```
