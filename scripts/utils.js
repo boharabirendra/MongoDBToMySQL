@@ -6,7 +6,7 @@ const { exec } = require("child_process");
 const { mongoSecrets } = require("./config");
 
 function recordsExport(collectionName) {
-  return `mongoexport --uri="mongodb://${mongoSecrets.USER}:${mongoSecrets.PASSWORD}@${mongoSecrets.HOST}:${mongoSecrets.PORT}/${mongoSecrets.DATABASE}" --authenticationDatabase=admin --db=${mongoSecrets.DATABASE} --collection=${collectionName} --out=json/${collectionName}.json`;
+  return `mongoexport --uri="mongodb+srv://${mongoSecrets.USER}:${mongoSecrets.PASSWORD}@${mongoSecrets.HOST}/${mongoSecrets.DATABASE}" --authenticationDatabase=admin --db=${mongoSecrets.DATABASE} --collection=${collectionName} --out=json/${collectionName}.json`;
 }
 
 /**

@@ -1,7 +1,7 @@
-const TABLE_NAME = 'rnr_campaign_evaluators';
+const TABLE_NAME = "rnr_campaign_evaluators";
 
 const RELATED_TABLES = {
-  CAMPAIGNS: 'rnr_campaigns',
+  CAMPAIGNS: "rnr_campaigns",
 };
 
 /**
@@ -12,16 +12,16 @@ const RELATED_TABLES = {
  */
 function up(knex) {
   return knex.schema.createTable(TABLE_NAME, (table) => {
-    table.string('id', 36).notNullable().primary();
-    table.string('campaign_id', 36).notNullable();
-    table.string('evaluator_id', 36).notNullable();
-    table.string('name', 90).notNullable();
-    table.string('emp_id', 255);
+    table.string("id", 36).notNullable().primary();
+    table.string("campaign_id", 36).notNullable();
+    table.integer("evaluator_id").notNullable();
+    table.string("name", 90).notNullable();
+    table.string("emp_id", 255);
     table
-      .foreign('campaign_id')
-      .references('id')
+      .foreign("campaign_id")
+      .references("id")
       .inTable(RELATED_TABLES.CAMPAIGNS)
-      .onDelete('CASCADE');
+      .onDelete("CASCADE");
   });
 }
 
