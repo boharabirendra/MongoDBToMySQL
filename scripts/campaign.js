@@ -1,8 +1,8 @@
-const fs = require('fs');
-const uuid = require('uuid');
-const csvWriter = require('csv-write-stream');
+const fs = require("fs");
+const uuid = require("uuid");
+const csvWriter = require("csv-write-stream");
 
-const Utils = require('./utils');
+const Utils = require("./utils");
 
 /**
  * Write data to campaigns, campaign_categories, and campaign_evaluators CSV files
@@ -15,33 +15,42 @@ function writeToFile(data) {
       const categoryWriter = csvWriter();
       const evaluatorWriter = csvWriter();
 
-      Utils.ensureFolderExists('csv');
+      Utils.ensureFolderExists("csv");
 
-      campaignWriter.pipe(fs.createWriteStream('csv/campaigns.csv'));
-      categoryWriter.pipe(fs.createWriteStream('csv/campaignCategories.csv'));
-      evaluatorWriter.pipe(fs.createWriteStream('csv/campaignEvaluators.csv'));
+      campaignWriter.pipe(fs.createWriteStream("csv/campaigns.csv"));
+      categoryWriter.pipe(fs.createWriteStream("csv/campaignCategories.csv"));
+      evaluatorWriter.pipe(fs.createWriteStream("csv/campaignEvaluators.csv"));
 
       data.forEach((campaign) => {
-        const campaignId = campaign._id['$oid'];
+        const campaignId = campaign._id["$oid"];
+
+        let status = "NOT_STARTED";
+        if (campaign.status === "Completed") {
+          status = "COMPLETED";
+        } else if (campaign.status === "Not Started") {
+          status = "IN_PROGRESS";
+        } else if (campaign.status === "In Progress") {
+          status = "NOT_STARTED";
+        }
 
         // Write to campaigns
         campaignWriter.write({
           id: campaignId,
           name: campaign.name,
           rewardee_message: campaign.rewardeeMessage,
-          status: campaign.status,
+          status: status,
           start_date: Utils.convertToMySQLTimestamp(
-            campaign.startDate['$date'],
+            campaign.startDate["$date"]
           ),
-          end_date: Utils.convertToMySQLTimestamp(campaign.endDate['$date']),
+          end_date: Utils.convertToMySQLTimestamp(campaign.endDate["$date"]),
           number_of_rewardee: campaign.numberOfRewardee,
           number_of_appreciation: campaign.numberOfAppreciation,
           max_appreciation_per_employee: campaign.maxAppreciationPerEmployee,
           created_at: Utils.convertToMySQLTimestamp(
-            campaign.createdAt['$date'],
+            campaign.createdAt["$date"]
           ),
           updated_at: Utils.convertToMySQLTimestamp(
-            campaign.updatedAt['$date'],
+            campaign.updatedAt["$date"]
           ),
         });
 
@@ -49,13 +58,13 @@ function writeToFile(data) {
           categoryWriter.write({
             id: uuid.v4(),
             campaign_id: campaignId,
-            category_id: categoryId['$oid'],
+            category_id: categoryId["$oid"],
           });
         });
 
         campaign.evaluators.forEach((evaluator) => {
           evaluatorWriter.write({
-            id: evaluator._id['$oid'],
+            id: evaluator._id["$oid"],
             campaign_id: campaignId,
             evaluator_id: evaluator.id,
             name: evaluator.name,
@@ -68,13 +77,13 @@ function writeToFile(data) {
       categoryWriter.end();
       evaluatorWriter.end();
 
-      campaignWriter.on('finish', resolve);
-      categoryWriter.on('finish', resolve);
-      evaluatorWriter.on('finish', resolve);
+      campaignWriter.on("finish", resolve);
+      categoryWriter.on("finish", resolve);
+      evaluatorWriter.on("finish", resolve);
 
-      campaignWriter.on('error', reject);
-      categoryWriter.on('error', reject);
-      evaluatorWriter.on('error', reject);
+      campaignWriter.on("error", reject);
+      categoryWriter.on("error", reject);
+      evaluatorWriter.on("error", reject);
     } catch (error) {
       reject(error);
     }
@@ -89,34 +98,34 @@ function writeToFile(data) {
  */
 
 const mongoToSQLCampaigns = async (connection) => {
-  const exportCampaignCMD = Utils.recordsExport('campaigns');
+  const exportCampaignCMD = Utils.recordsExport("campaigns");
   await Utils.executeCMDCommand(exportCampaignCMD);
-  Utils.giveReadPermission('campaigns');
+  Utils.giveReadPermission("campaigns");
 
   try {
-    const parsedData = await Utils.parseJSONFile('campaigns');
+    const parsedData = await Utils.parseJSONFile("campaigns");
 
     await writeToFile(parsedData);
 
     await Utils.loadDataFromCSVToMySQL(
-      'csv/campaigns.csv',
-      'rnr_campaigns',
-      connection,
+      "csv/campaigns.csv",
+      "rnr_campaigns",
+      connection
     );
     await Utils.loadDataFromCSVToMySQL(
-      'csv/campaignCategories.csv',
-      'rnr_campaign_categories',
-      connection,
+      "csv/campaignCategories.csv",
+      "rnr_campaign_categories",
+      connection
     );
     await Utils.loadDataFromCSVToMySQL(
-      'csv/campaignEvaluators.csv',
-      'rnr_campaign_evaluators',
-      connection,
+      "csv/campaignEvaluators.csv",
+      "rnr_campaign_evaluators",
+      connection
     );
 
-    console.log('Campaign data migration completed successfully.');
+    console.log("Campaign data migration completed successfully.");
   } catch (error) {
-    console.error('Error during campaign data migration:', error.message);
+    console.error("Error during campaign data migration:", error.message);
   }
 };
 
