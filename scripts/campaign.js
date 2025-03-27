@@ -28,9 +28,9 @@ function writeToFile(data) {
         if (campaign.status === "Completed") {
           status = "COMPLETED";
         } else if (campaign.status === "Not Started") {
-          status = "IN_PROGRESS";
-        } else if (campaign.status === "In Progress") {
           status = "NOT_STARTED";
+        } else if (campaign.status === "In Progress") {
+          status = "IN_PROGRESS";
         }
 
         // Write to campaigns
